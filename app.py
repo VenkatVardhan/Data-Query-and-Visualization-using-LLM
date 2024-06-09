@@ -4,14 +4,12 @@ import random
 import mysql.connector
 
 
-
+#mysql connection code with password and database
 mydb = mysql.connector.connect(host="localhost",user="root",password="Sreeneves@1",database="vardhan")
 if mydb.is_connected():
     print("Connection is established")
 mycursor = mydb.cursor()
 
-
-    
 mycursor.execute('''CREATE TABLE IF NOT EXISTS CompanyExpenditure (
     ExpenditureID INT AUTO_INCREMENT PRIMARY KEY,
     CompanyName VARCHAR(50) NOT NULL,
@@ -27,7 +25,6 @@ sql_insert = '''
 INSERT INTO CompanyExpenditure (CompanyName, ExpenseType, Amount, Year, Department, PaymentMethod, AnnualIncome) 
 VALUES (%s, %s, %s, %s, %s, %s, %s)
 '''
-
 
 data = [
     ('Apple Inc.', 'Office Supplies', 500.00, 2022, 'HR', 'CreditCard', 1000000.00),
