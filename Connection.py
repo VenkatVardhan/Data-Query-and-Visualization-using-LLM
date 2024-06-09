@@ -1,33 +1,47 @@
-import sys
-from faker import Faker
-import random
-import mysql.connector
+from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from config import DB_USERNAME, DB_PASSWORD, DB_HOST, DB_NAME
+from urllib.parse import quote_plus
 
 
+password = quote_plus(DB_PASSWORD)
 
-mydb = mysql.connector.connect(host="localhost",user="root",password="Sreeneves@1",database="vardhan")
-if mydb.is_connected():
-    print("Connection is established")
-mycursor = mydb.cursor()
+Base = declarative_base()
 
 
-    
-mycursor.execute('''CREATE TABLE IF NOT EXISTS CompanyExpenditure (
-    ExpenditureID INT AUTO_INCREMENT PRIMARY KEY,
-    CompanyName VARCHAR(50) NOT NULL,
-    ExpenseType VARCHAR(50) NOT NULL,
-    Amount DECIMAL(10, 2) NOT NULL,
-    Year INT NOT NULL,
-    Department VARCHAR(20) NOT NULL,
-    PaymentMethod VARCHAR(10) NOT NULL,
-    AnnualIncome DECIMAL(10, 2)
-);''')
+class CompanyExpenditure(Base):
+    __tablename__ = 'Expenditure'  
 
-sql_insert = '''
-INSERT INTO CompanyExpenditure (CompanyName, ExpenseType, Amount, Year, Department, PaymentMethod, AnnualIncome) 
-VALUES (%s, %s, %s, %s, %s, %s, %s)
-'''
+    ExpenditureID = Column(Integer, primary_key=True, autoincrement=True)
+    CompanyName = Column(String(50), nullable=False)
+    ExpenseType = Column(String(50), nullable=False)
+    Amount = Column(Float(precision=2), nullable=False)
+    Year = Column(Integer, nullable=False)
+    Department = Column(String(20), nullable=False)
+    PaymentMethod = Column(String(10), nullable=False)
+    AnnualIncome = Column(Float(precision=2))
 
+    def __init__(self, CompanyName, ExpenseType, Amount, Year, Department, PaymentMethod, AnnualIncome):
+        self.CompanyName = CompanyName
+        self.ExpenseType = ExpenseType
+        self.Amount = Amount
+        self.Year = Year
+        self.Department = Department
+        self.PaymentMethod = PaymentMethod
+        self.AnnualIncome = AnnualIncome
+
+# MySQL Connection
+db_uri = f"mysql+mysqlconnector://{DB_USERNAME}:{password}@{DB_HOST}/{DB_NAME}"
+
+
+# Encode the password
+
+engine = create_engine(db_uri)
+Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
 
 data = [
     ('Apple Inc.', 'Office Supplies', 500.00, 2022, 'HR', 'CreditCard', 1000000.00),
@@ -51,13 +65,15 @@ data = [
     ('Walmart Inc.', 'Marketing', 1200.00, 2022, 'Marketing', 'Check', 2300000.00),
     ('Johnson & Johnson', 'Office Supplies', 650.00, 2021, 'Finance', 'Cash', 1600000.00)
 ]
+
 try:
-
-    mycursor.executemany(sql_insert, data)
-
-
-    mydb.commit()
-
+    for d in data:
+        company_expense = CompanyExpenditure(*d)
+        session.add(company_expense)
+    session.commit()
     print("Data inserted successfully.")
-except mysql.connector.Error as err:
-    print("Error:", err)
+except Exception as e:
+    print("Error:", e)
+    session.rollback()
+finally:
+    session.close()
