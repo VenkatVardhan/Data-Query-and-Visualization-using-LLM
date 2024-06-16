@@ -42,6 +42,7 @@ Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
+print("success")
 
 data = [
     ('Apple Inc.', 'Office Supplies', 500.00, 2022, 'HR', 'CreditCard', 1000000.00),
@@ -68,9 +69,23 @@ data = [
 
 try:
     for d in data:
-        company_expense = CompanyExpenditure(*d)
-        session.add(company_expense)
+            # Check if the record already exists
+            exists = session.query(CompanyExpenditure).filter_by(
+                CompanyName=d[0],
+                ExpenseType=d[1],
+                Amount=d[2],
+                Year=d[3],
+                Department=d[4],
+                PaymentMethod=d[5],
+                AnnualIncome=d[6]
+            ).first()
+
+            if not exists:
+                company_expense = CompanyExpenditure(*d)
+                session.add(company_expense)
+
     session.commit()
+  
     print("Data inserted successfully.")
 except Exception as e:
     print("Error:", e)
