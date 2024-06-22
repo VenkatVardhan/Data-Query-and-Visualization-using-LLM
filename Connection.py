@@ -69,7 +69,7 @@ data = [
 
 try:
     for d in data:
-            # Check if the record already exists
+            
             exists = session.query(CompanyExpenditure).filter_by(
                 CompanyName=d[0],
                 ExpenseType=d[1],
