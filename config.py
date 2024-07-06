@@ -1,5 +1,0 @@
-DB_USERNAME = "root"
-DB_PASSWORD = "Sreeneves@1"
-DB_HOST = "localhost"
-DB_NAMEa = "vardhan"
-DB_NAME = "company"

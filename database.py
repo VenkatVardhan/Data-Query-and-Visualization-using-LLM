@@ -63,7 +63,7 @@ class Order(Base):
     CustomerID = Column(Integer, ForeignKey('customers.CustomerID'), nullable=False)
     Quantity = Column(Integer, nullable=False)
     SaleDate = Column(Date, nullable=False)
-    CustomerAddress = Column(String(100), nullable=False)  # Remove ForeignKey constraint here
+    CustomerAddress = Column(String(100), nullable=False)
 
     def __init__(self, ProductID, CustomerID, Quantity, SaleDate, CustomerAddress):
         self.ProductID = ProductID
